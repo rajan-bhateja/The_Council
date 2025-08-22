@@ -1,5 +1,8 @@
-streamlit~=1.48.1
-swarms~=8.1.1
-python-dotenv~=1.1.1
-langchain-openai~=0.3.31
-langchain-google-genai~=2.1.9
+streamlit
+swarms
+python-dotenv
+langchain-openai
+langchain-google-genai
+langchain-groq
+langchain-mistralai
+langchain-huggingface
