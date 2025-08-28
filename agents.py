@@ -1,58 +1,44 @@
-from swarms import Agent, ConcurrentWorkflow
+from swarms import Agent, InteractiveGroupChat, round_robin_speaker
 from dotenv import load_dotenv
-
-from langchain_openai import ChatOpenAI
-from langchain_groq import ChatGroq
-from langchain_mistralai import ChatMistralAI
-from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain_huggingface import ChatHuggingFace, HuggingFaceEndpoint
 
 # Load the environment variables
 load_dotenv()
 
-# Define different LLMs
-openai_llm = ChatOpenAI(model="gpt-5o-mini")
-gemini_llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash")
-groq_llm = ChatGroq(model="moonshotai/kimi-k2-instruct")
-mistral_llm = ChatMistralAI(model="mistral-large-latest")
-hf_llm = ChatHuggingFace(llm=HuggingFaceEndpoint(
-    repo_id="deepseek-ai/DeepSeek-V3",
-    task="text-generation",
-    provider="auto",
-))
 
-openai_agent = Agent(
-    agent_name="OpenAI Agent",
-    agent_description="",
-    system_prompt="You are a helpful assistant that answers the user's query concisely in bullet points."
+overview_agent = Agent(
+    agent_name="Overview Agent",
+    agent_description="Your job is to provide an overview of the user's query.",
+    system_prompt="You are a helpful assistant that answers the user's query comprehensively in bullet points.",
+    model_name="gpt-4.1",
 )
 
-gemini_agent = Agent(
-    agent_name="Gemini Agent",
-    agent_description="",
-    system_prompt="You are a helpful assistant that answers the user's query concisely in bullet points."
+pros_cons_agent = Agent(
+    agent_name="Pros & Cons Agent",
+    agent_description="Your job is to provide the user with the pros and cons of their query.",
+    system_prompt="You are a helpful assistant that answers the user's query comprehensively in bullet points.",
+    model_name="gpt-4.1",
 )
 
-mistral_agent = Agent(
-    agent_name="Mistral Agent",
-    agent_description="",
-    system_prompt="You are a helpful assistant that answers the user's query concisely in bullet points."
+practical_agent = Agent(
+    agent_name="Practical Agent",
+    agent_description="Your job is to provide a technical, economical, environmental, and socially feasibility report on the user's query.",
+    system_prompt="You are a helpful assistant that answers the user's query comprehensively in bullet points, keeping the other agents' viewpoints in mind.",
+    model_name="gpt-4.1",
 )
 
-groq_agent = Agent(
-    agent_name="Groq Agent",
-    agent_description="",
-    system_prompt="You are a helpful assistant that answers the user's query concisely in bullet points."
+expert_agent = Agent(
+    agent_name="Expert Agent",
+    agent_description="Your job is to provide an expert opinion on the user's query, keeping other agents' viewpoints in view.",
+    system_prompt="You are an expert in the user's query's field that answers the user's query comprehensively in bullet points.",
+    model_name="gpt-4.1",
 )
 
-hf_agent = Agent(
-    agent_name="HF Agent",
-    agent_description="",
-    system_prompt="You are a helpful assistant that answers the user's query concisely in bullet points."
-)
-
-workflow = ConcurrentWorkflow(
+workflow = InteractiveGroupChat(
     name="The Council",
-    agents=[openai_agent, gemini_agent, mistral_agent, groq_agent, hf_agent],
-    show_dashboard=True
+    agents=[overview_agent, pros_cons_agent, practical_agent, expert_agent],
+    interactive=True,
+    speaker_function=round_robin_speaker
 )
+
+# history = workflow.run("I'm having thoughts of building a Formula 1 car.")
+# print(history)
